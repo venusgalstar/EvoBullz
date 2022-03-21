@@ -45,8 +45,6 @@ const marks = [
   }
 ];
 
-
-
 const PrettoSlider = styled(Slider)({
   color: '#ff9a3d',
   height: 4,
@@ -146,7 +144,6 @@ function App() {
 
   ]
 
-
   return (
     <>
       <div className='header padder-50' style={{justifyContent:"flex-end"}}>
@@ -235,7 +232,7 @@ function App() {
             We are open to collaboration and we want to include the
             owners in the growth and management of the project.
             In our plans there are staking, governance tokens and DAO,
-            read more in the roadmaps..
+            read more in the roadmaps.
             </p>
             <div className='clanz_buttons'>
               <ThemeProvider theme={loadmapTheme}>
@@ -272,13 +269,13 @@ function App() {
       <div id="section_tokenomics_11" >
         <div className='teamrate_explain' >
           <p className='fs-20 c-w'>
-            The part destined for the team will be used for development and marketing
+            The part destined for the team will be used for development and marketing.
           </p>
         </div>
         <div className='airdroprate_explain' >
           <p className='fs-20 c-w'>
-            A big part of the minting proceeds will be <b>airdropped
-            to the holder</b> who have not listed their Bullz in the first
+            A big part of the minting proceeds will be <strong>airdropped
+            to the holder</strong> who have not listed their Bullz in the first
             month. This as a reward for believing in us, only Gen 0
             will have such a great return for its owners.
           </p>
