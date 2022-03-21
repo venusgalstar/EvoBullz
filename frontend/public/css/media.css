@@ -156,6 +156,10 @@
         display: flex !important;
         justify-content: center;
     }
+    .minting_panel_out_borderdiv{
+        overflow-x: clip;
+        overflow-y: clip;
+    }
     .staking_explain,
     .growth_explain,
     .airdroprate_explain {
