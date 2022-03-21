@@ -58,6 +58,9 @@
     #section_mint{
         margin-top: 100px;
     }
+    .control_mint_panel{
+        margin-top: 30px;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -158,7 +161,6 @@
     }
     .minting_panel_out_borderdiv{
         overflow-x: clip;
-        overflow-y: clip;
     }
     .staking_explain,
     .growth_explain,
