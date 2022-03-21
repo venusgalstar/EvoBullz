@@ -1,13 +1,46 @@
 @media (max-width: 1200px) {
-    .right_image {
-        width: 430px;
-        height: 430px;
+    .right_image,
+    .growthchat_image_area {
+        width: 320px;
+        height: 340px;
+    }
+    
+    .half_image_area,
+    .stakingpercent_image_area{
+        width: 320px;
+        height: 320px;
     }
 }
 
+@media (max-width: 1600px) {
+    .right_image,
+    .growthchat_image_area {
+        width: 360px;
+        height: 390px;
+    }
+    
+    .half_image_area,
+    .stakingpercent_image_area{
+        width: 360px;
+        height: 360px;
+    }
+}
+
+@media (max-width: 1980px) {
+    .right_image,
+    .growthchat_image_area {
+        width: 360px;
+        height: 390px;
+    }
+    
+    .half_image_area,
+    .stakingpercent_image_area{
+        width: 360px;
+        height: 360px;
+    }
+}
 
 @media (max-width: 1024px) {
-
 
     .clanz_content {
         display: flex;
@@ -95,6 +128,18 @@
         padding-left: 50px;
     }
 
+    .right_image,
+    .growthchat_image_area {
+        width: 280px;
+        height: 300px;
+    }
+    
+    .half_image_area,
+    .stakingpercent_image_area{
+        width: 280px;
+        height: 280px;
+    }
+
 }
 
 @media (max-width: 850px) {
@@ -108,6 +153,17 @@
         padding-left: 40px;
     }
 
+    .right_image,
+    .growthchat_image_area {
+        width: 280px;
+        height: 300px;
+    }
+    
+    .half_image_area,
+    .stakingpercent_image_area{
+        width: 280px;
+        height: 280px;
+    }
 }
 
 
@@ -169,6 +225,18 @@
     .mint-subtitle {
         font-size: 27px;
 
+    }
+    
+    .right_image,
+    .growthchat_image_area {
+        width: 280px;
+        height: 300px;
+    }
+    
+    .half_image_area,
+    .stakingpercent_image_area{
+        width: 280px;
+        height: 280px;
     }
 }
 
@@ -254,6 +322,17 @@
         font-size: 15px !important;
     }
 
+    .right_image,
+    .growthchat_image_area {
+        width: 280px;
+        height: 300px;
+    }
+    
+    .half_image_area,
+    .stakingpercent_image_area{
+        width: 280px;
+        height: 280px;
+    }
 }
 
 @media (max-width: 450px) {
@@ -284,9 +363,16 @@
         padding-bottom: 10px !important;
     }
 
-    .right_image {
-        width: 320px;
-        height: 320px;
+    .right_image,
+    .growthchat_image_area {
+        width: 280px;
+        height: 300px;
+    }
+    
+    .half_image_area,
+    .stakingpercent_image_area{
+        width: 280px;
+        height: 280px;
     }
 
     .rhino-container {

@@ -20,7 +20,7 @@ const connectTheme = createTheme({
 const mintTheme = createTheme({
   palette: {
     primary: {
-      main: "#df2382"
+      main: "#ff9a3d"
     }
   }
 })
@@ -48,7 +48,7 @@ const marks = [
 
 
 const PrettoSlider = styled(Slider)({
-  color: '#f681b7',
+  color: '#ff9a3d',
   height: 4,
   '& .MuiSlider-track': {
     border: 'none',
@@ -56,8 +56,10 @@ const PrettoSlider = styled(Slider)({
   '& .MuiSlider-thumb': {
     height: 24,
     width: 24,
-    backgroundColor: '#f681b7',
-    border: '2px solid #e71173',
+    backgroundColor: '#ff9a3d',
+    border: '2px solid #df7a1d',
+    borderRadius : "0",
+    transform: "translate(-50%, -50%) rotate(45deg)",
     '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
       boxShadow: 'inherit',
     },
@@ -73,12 +75,11 @@ const PrettoSlider = styled(Slider)({
     width: 32,
     height: 32,
     borderRadius: '50% 50% 50% 0',
-    backgroundColor: '#f681b7',
+    backgroundColor: '#ff9a3d',
     transformOrigin: 'bottom left',
-    transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
     '&:before': { display: 'none' },
     '&.MuiSlider-valueLabelOpen': {
-      transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
+      transform: 'translate(0%, -90%) rotate(270deg) scale(1)',
     },
     '& > *': {
       transform: 'rotate(45deg)',
@@ -106,13 +107,10 @@ function RoadMap(props) {
 
 const web3 = new Web3();
 
-
 function App() {
 
-  const [count, setCount] = useState(20);
+  const [count, setCount] = useState(5);
   const [account, setAccount] = useState();
-
-
 
   const handleChange = (event, newValue) => {
     setCount(newValue);
@@ -151,85 +149,93 @@ function App() {
 
   return (
     <>
-      <div className='header padder-50'>
-        <div>
-          <a className='link-twitter'>
-            <i className="fab fa-twitter"></i>
-          </a>
-          <a className='link-discord'>
-            <i className="fab fa-discord"></i>
-          </a>
-        </div>
+      <div className='header padder-50' style={{justifyContent:"flex-end"}}>
         <ThemeProvider theme={connectTheme}>
           <Button variant="contained" color="primary" className="btn_connect" onClick={connectWallet}>Connect Wallet</Button>
         </ThemeProvider>
       </div>
       <div id='section_mint'>
-        <div >
+        <div style={{ marginBottom: "20px" }}>
           <div className='mint-title' >
-            Cro Rhino Clanz
+            Evo Bullz
           </div>
           <div className='mint-subtitle'>
-            3333 Rhinos v2 on the Cronos Chain
+            333 Bullz on the Cronos Chain
           </div>
         </div>
-        <div className='mint_pannel m-t-20'>
-          <div className='c-w fs-60 h-60 flex align-center justify-center noto-bold font-bold'>
-            n  /  3333
-          </div>
-          <div className='c-w h-50 fs-20 flex align-center noto-bold font-bold'>
-            minted
-          </div>
-          <div className='c-w h-70 fs-32 flex align-center noto-bold font-bold'>
-            Price: {count * 50} CRO
-          </div>
-          <div className='flex flex-col align-center justify-center h-100' >
-            <PrettoSlider
-              valueLabelDisplay="auto"
-              aria-label="pretto slider"
-              defaultValue={3}
-              min={0}
-              max={20}
-              value={count}
-              onChange={handleChange}
-            />
-            <div className='flex w-full justify-between'>
-              <span className='c-w fs-20 noto-bold font-extraBold'>0</span>
-              <span className='c-w fs-15 flex1'></span>
-              <span className='c-w fs-20 noto-bold font-extraBold'>20</span>
+        <div 
+          style={{
+            width:"85%", 
+            display:"flex", 
+            justifyContent:"space-around",
+            background: "#ff9a3d",
+            padding: "25px",
+            position: "relative"
+          }}>
+            <div className="pannel-pattern left-top"></div>
+            <div className="pannel-pattern right-top"></div>
+            <div className="pannel-pattern left-bottom"></div>
+            <div className="pannel-pattern right-bottom"></div>
+          <div className='mint_pannel' 
+            style={{
+              width:"100%", 
+              display:"flex", 
+              justifyContent:"space-around"
+            }}>
+            <div style={{width:"30%", justifyContent:"flex-end" }} >
+              <img src="/img/Asset 1.png" alt="/" width="100%" height="100%" ></img>
+            </div>
+            <div style={{width:"30%", justifyContent:"flex-start" }}>
+            <div className='c-w fs-60 h-60 flex align-center justify-center noto-bold font-bold'>
+              0°  /  333
+            </div>
+            <div className='c-w h-50 fs-20 flex align-center noto-bold font-bold'>
+              minted
+            </div>
+            <div className='c-w h-70 fs-32 flex align-center noto-bold font-bold'>
+              Price: {count * 50} CRO
+            </div>
+            <div className='flex flex-col align-center justify-center h-100' >
+              <PrettoSlider
+                valueLabelDisplay="auto"
+                aria-label="pretto slider"
+                defaultValue={3}
+                min={1}
+                max={10}
+                value={count}
+                onChange={handleChange}
+              />
+              <div className='flex w-full justify-between'>
+                <span className='c-w fs-20 noto-bold font-extraBold'>1</span>
+                <span className='c-w fs-15 flex1'></span>
+                <span className='c-w fs-20 noto-bold font-extraBold'>10</span>
+              </div>
+            </div>
+            <div className='flex justify-center'>
+              <ThemeProvider theme={mintTheme}>
+                <Button className='btn_mint font-bold' style={{ color: "white" }} variant='contained'>MINT</Button>
+              </ThemeProvider>
             </div>
           </div>
-          <div className='flex justify-center'>
-            <ThemeProvider theme={mintTheme}>
-              <Button className='btn_mint font-bold' color='primary' variant='contained'>MINT</Button>
-            </ThemeProvider>
-          </div>
+        </div>
         </div>
       </div>
       <div id='section_clanz'>
         <div className='title fs-40 c-w noto-bold font-extraBold'>
-          Cro Rhino Clanz
+          Evo Bullz NFT
         </div>
         <div className='clanz_content content-max'>
           <div className='left flex flex-col flex1'>
             <p className='fs-20 c-w'>
-
-              Welcome to the Rhino Clanz. Rhino Clanz is a collection of 3333
-              unique NFT. CRC digital collectibles living on the Cronos
-              Blockchain. Each Rhino Clanz is a unique non fungibles token (NFT),
-              mix of various assets, colors, and backgrounds to make them unique.
-              Rhino Clanz acts as an essential part of interacting within our
-              community through Social Media and future airdrops and other perks.
-              Future develop and perks will be released over time.
-            </p>
-            <p className='fs-20 c-w m-t-20'>
-              Holding Cro Rhino Clanz allows you to participate in the CRC event and
-              could win NFT, Merch and many others things after the public sale ends!
-              Holders can vote for experiences, activations and campaigns that benefit
-              the Rhino Clanz.<br />
-              The Cro Rhino Clanz (CRC) public sales opens on __ , FEBRUARY XXth
-              around ____pm XXX.<br />
-              Join the Rhino Clanz community on Twitter and Discord!
+            Evo Bullz is a project that firmly believes in the Cronos
+            Chain. We want to built an exclusive community around this
+            project.
+            Our goal is to grow together, bringing value to the
+            ecosystem and its owners.<p></p>
+            We are open to collaboration and we want to include the
+            owners in the growth and management of the project.
+            In our plans there are staking, governance tokens and DAO,
+            read more in the roadmaps..
             </p>
             <div className='clanz_buttons'>
               <ThemeProvider theme={loadmapTheme}>
@@ -250,251 +256,78 @@ function App() {
             </div>
           </div>
         </div>
-        <div style={{ background: "white", height: "2px", marginTop: "180px" }}></div>
-        <div className='flex m-t-80 content-max' >
-          <div className='rhino-container'>
-            <div className='left'></div>
-            <div className='right'>
-              <div className='rhino-item'>
-                <div className='c-df238e noto-bold flex justify-center font-bold' style={{ flex: 2 }}>
-                  3333
-                </div>
-                <div className='c-df238e noto-bold flex justify-center font-bold' style={{ flex: 4 }}>
-                  RHINO
-                </div>
-              </div>
-              <div className='rhino-item'>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 2 }}>
-                  15
-                </div>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 4 }}>
-                  BACKGROUND
-                </div>
-              </div>
-              <div className='rhino-item'>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 2 }}>
-                  22
-                </div>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 4 }}>
-                  CLOTHES
-                </div>
-              </div>
-              <div className='rhino-item'>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 2 }}>
-                  15
-                </div>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 4 }}>
-                  EYES
-                </div>
-              </div>
-              <div className='rhino-item'>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 2 }}>
-                  18
-                </div>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 4 }}>
-                  MOUTH
-                </div>
-              </div>
-              <div className='rhino-item'>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 2 }}>
-                  18
-                </div>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 4 }}>
-                  HEADGEAR
-                </div>
-              </div>
-              <div className='rhino-item'>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 2 }}>
-                  17
-                </div>
-                <div className='c-w noto-bold flex justify-center' style={{ flex: 4 }}>
-                  BODY
-                </div>
-              </div>
-            </div>
-          </div>
+        <div style={{ background: "white", height: "2px", marginTop: "100px", marginBottom: "100px" }}></div>     
+      </div>   
+      
+      <div id="section_tokenomics_00">
+        <div id="team_rate" className='title fs-40 c-w noto-bold font-extraBold'>
+            Team<br></br>&nbsp;&nbsp;50%
+        </div>
+        <div className='half_image_area' >
+        </div>
+        <div id="airdrop_rate" className='title fs-40 c-w noto-bold font-extraBold'>
+            Airdrop<br></br>&nbsp;&nbsp;&nbsp;&nbsp;50%
         </div>
       </div>
+      <div id="section_tokenomics_11" >
+        <div className='teamrate_explain' >
+          <p className='fs-20 c-w'>
+            The part destined for the team will be used for development and marketing
+          </p>
+        </div>
+        <div className='airdroprate_explain' >
+          <p className='fs-20 c-w'>
+            A big part of the minting proceeds will be <b>airdropped
+            to the holder</b> who have not listed their Bullz in the first
+            month. This as a reward for believing in us, only Gen 0
+            will have such a great return for its owners.
+          </p>
+        </div>
+      </div>
+      <div id="section_tokenomics_22" >
+        <div className='stakingpercent_image_area' >          
+        </div>
+        <div className='middle_empty_area'></div>
+        <div className='growthchat_image_area' >
+        </div>
+      </div>
+      <div id="section_tokenomics_33" >
+        <div className='staking_explain' >
+          <div className=" fs-30 c-w noto-bold font-extraBold" style={{ textAlign: "center" }} >Staking</div>
+          <p className='fs-20 c-w'>
+          Staking will return the 80% of the royalties to the stakers, every week, and further on, in our own token.          
+          </p>
+        </div>
+        <div className='middle_empty_area'></div>
+        <div className='growth_explain' >
+          <div className=" fs-30 c-w noto-bold font-extraBold" style={{ textAlign: "center" }} >Growth</div>
+          <p className='fs-20 c-w'>
+            There will be an increase in the value of these NFTs with the increase of the volumes traded on the Cronos Chain.
+          </p>
+        </div> 
+      </div>      
 
-      <div id='section_roadmap'>
+      <div id='section_roadmap'>  
+        <div style={{ background: "white", height: "2px", marginTop: "100px", marginBottom: "10px" }}></div>     
         <div className='title flex align-center justify-center c-black noto-bold font-extraBold'>
           Roadmap
         </div>
-        <div className='content padder-80 m-t-50 content-max'>
-          <div>
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    1
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                Launch Discord Server, and Twitter Account.
-              </div>
+        <div className='content m-t-50 content-max'>     
+          <div className='roadmaprow' >     
+            <div className='yellowpanel '>            
             </div>
-
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    2
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                Airdrop for v1 holders.
-              </div>
+          </div>     
+          <div className='roadmaprow' 
+            style={{
+              display: "flex",
+              justifyContent: "flex-end"
+            }}
+          >         
+            <div className='yellowpanel'>            
             </div>
-
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    3
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                Private sale minting starts on own site, when it's sold out the public goes live on own site and on Ebisu's Bay/Agora launchpad.
-              </div>
-            </div>
-
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    4
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                Listing in Ebisu's Bay and Agora marketplace.
-              </div>
-            </div>
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    5
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                First contest coming for minters.
-              </div>
-            </div>
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    6
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                At 100% minted goes live rarity traits tools.
-
-              </div>
-            </div>
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    7
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                Big prize for the holders.
-
-              </div>
-            </div>
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    8
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                NFT Stacking.
-
-              </div>
-            </div>
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    9
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                Buy Metaverse land for Cro Rhino Clanz holder.
-
-              </div>
-            </div>
-            <div className='roadmap-row'>
-              <div className='roadmap_index'>
-                <div className='roadmap_item'>
-                  <span className='fs-26 noto-bold c-black'>
-                    10
-                  </span>
-                </div>
-              </div>
-              <div className='fs-30 m-l-10'>
-                Launch Baby Rhino Clanz.
-              </div>
-            </div>
-
-          </div>
-          <div className='nft padder-40 m-t-70 m-b-70'>
-            <ul className='c-w fs-35 l-h-1-5'>
-              <li>
-                Big <b>prize</b> for NFT minter (private and public)
-              </li>
-              <li>
-                Prizes could be NFT, Cryptocurrencies, Merch, and many others.
-              </li>
-              <li>
-                Exclusive space like <b>lands in metaverses</b> and <b>discord channel</b> for verified <b>Rhino Clanz owner</b> where the community will <b>shape the future</b> of the club by <b>voting</b> on current and future events and decision.
-              </li>
-              <li>
-                Exploring potential collabs that can bring advantages to the holders.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* section team */}
-      <div id='sectoin_team'>
-        <div style={{ background: "white", height: "2px" }}></div>
-        <div className='fs-40 noto-bold c-w text-center m-t-50 font-extraBold content-max'>
-          Team
-        </div>
-        <div className='content-max'>
-          <div className='team-member'>
-            <div className='text-center'>
-              <div className='photo_item'></div>
-              <div className='c-w fs-20'>Name</div>
-            </div>
-            <div className='text-center'>
-              <div className='photo_item'></div>
-              <div className='c-w fs-20'>Name</div>
-            </div>
-          </div>
-          <div className='team-member m-t-70'>
-            <div className='text-center'>
-              <div className='photo_item'></div>
-              <div className='c-w fs-20'>Name</div>
-            </div>
-            <div className='text-center'>
-              <div className='photo_item'></div>
-              <div className='c-w fs-20'>Name</div>
+          </div>     
+          <div className='roadmaprow' >
+            <div className='yellowpanel '>            
             </div>
           </div>
         </div>
@@ -518,7 +351,7 @@ function App() {
             <img src='/img/discord.png'></img>
           </div>
           <div className='c-w fs-24 flex align-center text-center m-t-20'>
-            The Rhino Clanz<br />© 2021
+            Evo Bullz<br />© 2022
           </div>
         </div>
       </div>
