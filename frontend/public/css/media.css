@@ -156,7 +156,11 @@
         display: flex !important;
         justify-content: center;
     }
-
+    .staking_explain,
+    .growth_explain,
+    .airdroprate_explain {
+        width:auto;
+    }
     .roadmaprow, .roadmaprow1{
         display: flex;
         justify-content: center;
