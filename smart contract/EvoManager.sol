@@ -9,12 +9,10 @@ contract EvoManager is Ownable {
 
     struct StakingInfo {
         uint256 tokenId;
-        string tokenHash;
         address currentOwner;
         uint256 startTime;
         uint256 interval;
         uint24 royaltyRatio;
-        uint8 kindOfCoin;
     }
 
     address evoManagerAddress;
@@ -31,13 +29,16 @@ contract EvoManager is Ownable {
     mapping(string => uint) _getStakingId;
     mapping(string => bool) _tokenHashExists;
 
-    modifier nonReentrant() {
-        require(_status != true, "ReentrancyGuard: reentrant call");
-        _status = true;
-        _;
-        _status = false;
-    }
-
+    event Received(address addr, uint amount);
+    event Fallback(address addr, uint amount);
+    event ChangeEvoNFTAddress(address newddr);
+    event ChangeEvoTokenAddress(address newddr);
+    event ChangeMintingFee(uint256 fee);
+    event SingleMintingHappend(address addr, string tokenUri);
+    event MultipleMintingHappend(address addr, string[] tokenUris);
+    event OwnerIsChanged(address addr);
+    event transferFunds(address addr, uint256 amount, uint8 kind);
+    
     constructor(address _nftAddress, address _evoAddress, uint256 _minFee) {
         evoManagerAddress = msg.sender;
         evoNFTaddress = _nftAddress;
@@ -47,9 +48,25 @@ contract EvoManager is Ownable {
         _status = false;
     }
 
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
+    }
+
+    fallback() external payable { 
+        emit Fallback(msg.sender, msg.value);
+    }
+
+    modifier nonReentrant() {
+        require(_status != true, "ReentrancyGuard: reentrant call");
+        _status = true;
+        _;
+        _status = false;
+    }
+
     function setEvoNFTaddress(address _addr) external onlyOwner{
         require(_addr != address(0), "Invalid address...");
         evoNFTaddress = _addr;
+        emit ChangeEvoNFTAddress(_addr);
     }
 
     function getEvoNFTAddress() view external returns(address){
@@ -59,6 +76,7 @@ contract EvoManager is Ownable {
     function setEvoTokenAddress(address _addr) external onlyOwner{
         require(_addr != address(0), "Invalid address...");
         evoTokenAddress = _addr;
+        emit ChangeEvoTokenAddress(_addr);
     }
 
     function getEvoTokenAddress() view external returns(address){
@@ -68,6 +86,7 @@ contract EvoManager is Ownable {
     function setMintingFee(uint256 _amount) external onlyOwner {
         require(_amount >= 0, "Too small amount");
         _mintingFee = _amount;
+        emit ChangeMintingFee(_mintingFee);
     }
 
     function getMintingFee()  view external returns(uint256) {
@@ -80,6 +99,7 @@ contract EvoManager is Ownable {
         evoNFT = EvoBullNFT(evoNFTaddress);
         evoNFT.mint(msg.sender, _tokenHash);
         _tokenHashExists[_tokenHash] = true;
+        emit SingleMintingHappend(msg.sender, _tokenHash);
     }
 
     function mintMultipleNFT(string[] memory _tokenHashs) external payable nonReentrant {
@@ -92,7 +112,8 @@ contract EvoManager is Ownable {
             _tokenHashExists[_tokenHashs[i]] = true;
         }
         evoNFT = EvoBullNFT(evoNFTaddress);
-        evoNFT.batchMint(msg.sender, _tokenHashs);        
+        evoNFT.batchMint(msg.sender, _tokenHashs);     
+        emit MultipleMintingHappend(msg.sender, _tokenHashs);   
     }
     
     function getStakingInfo(string memory _tokenHash) public view returns (StakingInfo memory) {
@@ -116,6 +137,7 @@ contract EvoManager is Ownable {
         require(_newOwner != address(0), "Invalid input address...");
         evoManagerAddress = _newOwner;
         transferOwnership(evoManagerAddress);
+        emit OwnerIsChanged(evoManagerAddress);
     }
 
     function customizedTransfer(address payable _to, uint256 _amount, uint8 _kind) internal {
@@ -129,6 +151,7 @@ contract EvoManager is Ownable {
             evoToken = EvoToken(evoTokenAddress);
           evoToken.transfer(_to, _amount);
         }
+        emit transferFunds(_to, _amount, _kind);
     }
 
     function withDraw(uint256 _amount, uint8 _kind) external onlyOwner {
@@ -145,14 +168,6 @@ contract EvoManager is Ownable {
         require(remaining > 0, "None left to withdraw...");
 
         customizedTransfer(payable(msg.sender), remaining, _kind);
-    }
-
-    receive() payable external {
-
-    }
-
-    fallback() payable external {
-
     }
 
 }
