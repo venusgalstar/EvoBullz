@@ -10,6 +10,11 @@
 				"internalType": "address",
 				"name": "_evoAddress",
 				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_minFee",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -37,6 +42,45 @@
 	{
 		"stateMutability": "payable",
 		"type": "fallback"
+	},
+	{
+		"inputs": [],
+		"name": "getEvoNFTAddress",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getEvoTokenAddress",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getMintingFee",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -163,9 +207,30 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "_creater",
+				"name": "_addr",
 				"type": "address"
-			},
+			}
+		],
+		"name": "setEvoNFTaddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_addr",
+				"type": "address"
+			}
+		],
+		"name": "setEvoTokenAddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
 			{
 				"internalType": "uint256",
 				"name": "_amount",

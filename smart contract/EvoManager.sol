@@ -25,11 +25,11 @@ contract EvoManager is Ownable {
 
     uint _StakingIdCounter;
     bool _status;
+    uint256 private _mintingFee;
 
     mapping(uint => StakingInfo) _allStakingInfo;
     mapping(string => uint) _getStakingId;
     mapping(string => bool) _tokenHashExists;
-    mapping(address => uint256) _mintingFees;
 
     modifier nonReentrant() {
         require(_status != true, "ReentrancyGuard: reentrant call");
@@ -38,28 +38,61 @@ contract EvoManager is Ownable {
         _status = false;
     }
 
-    constructor(address _nftAddress, address _evoAddress) {
+    constructor(address _nftAddress, address _evoAddress, uint256 _minFee) {
         evoManagerAddress = msg.sender;
         evoNFTaddress = _nftAddress;
         evoTokenAddress = _evoAddress;
+        _mintingFee = _minFee;
         _StakingIdCounter = 0;
         _status = false;
     }
 
-    function mintSingleNFT(string memory _tokenHash) external payable  {
+    function setEvoNFTaddress(address _addr) external onlyOwner{
+        require(_addr != address(0), "Invalid address...");
+        evoNFTaddress = _addr;
+    }
+
+    function getEvoNFTAddress() view external returns(address){
+        return evoNFTaddress;
+    }
+
+    function setEvoTokenAddress(address _addr) external onlyOwner{
+        require(_addr != address(0), "Invalid address...");
+        evoTokenAddress = _addr;
+    }
+
+    function getEvoTokenAddress() view external returns(address){
+        return evoTokenAddress;
+    }
+
+    function setMintingFee(uint256 _amount) external onlyOwner {
+        require(_amount >= 0, "Too small amount");
+        _mintingFee = _amount;
+    }
+
+    function getMintingFee()  view external returns(uint256) {
+        return _mintingFee;
+    }
+
+    function mintSingleNFT(string memory _tokenHash) external payable nonReentrant {
+        require(msg.value >= _mintingFee, "Invalid price, price is less than minting fee.");
         require(!_tokenHashExists[_tokenHash], "Existing NFT hash value....");
         evoNFT = EvoBullNFT(evoNFTaddress);
         evoNFT.mint(msg.sender, _tokenHash);
         _tokenHashExists[_tokenHash] = true;
     }
 
-    function mintMultipleNFT(string[] memory _tokenHashs) external payable  {
-        for (uint256 i = 0; i < _tokenHashs.length; i++) {
+    function mintMultipleNFT(string[] memory _tokenHashs) external payable nonReentrant {
+        require(_tokenHashs.length > 0, "Invalid arguments, no hashes." );        
+        require(msg.value >= _mintingFee * _tokenHashs.length, "Invalid price, price is less than minting fee * countOfUris");
+        uint256 i;
+        for (i = 0; i < _tokenHashs.length; i++) 
+        {
             require(!_tokenHashExists[_tokenHashs[i]], "Existing NFT hash value....");
-            evoNFT = EvoBullNFT(evoNFTaddress);
-            evoNFT.mint(msg.sender, _tokenHashs[i]);
             _tokenHashExists[_tokenHashs[i]] = true;
         }
+        evoNFT = EvoBullNFT(evoNFTaddress);
+        evoNFT.batchMint(msg.sender, _tokenHashs);        
     }
     
     function getStakingInfo(string memory _tokenHash) public view returns (StakingInfo memory) {
@@ -83,12 +116,6 @@ contract EvoManager is Ownable {
         require(_newOwner != address(0), "Invalid input address...");
         evoManagerAddress = _newOwner;
         transferOwnership(evoManagerAddress);
-    }
-
-    function setMintingFee(address _creater, uint256 _amount) external onlyOwner {
-        require(_creater != address(0), "Invalid input address...");
-        require(_amount >= 0, "Too small amount");
-        _mintingFees[_creater] = _amount;
     }
 
     function customizedTransfer(address payable _to, uint256 _amount, uint8 _kind) internal {

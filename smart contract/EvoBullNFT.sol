@@ -11,7 +11,6 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
     Counters.Counter private _tokenIds;
 
     mapping(string => uint256) _getNFTId;
-    mapping(uint256 => string) _uriFromId;
 
     constructor() ERC721("EvoBullNFT", "EBNFT") {
 
@@ -22,8 +21,7 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
     }
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
-        super.tokenURI(_tokenId);
-        return _uriFromId[_tokenId];
+        return super.tokenURI(_tokenId);
     }
 
     function setTokenURI(uint256 tokenId, string memory _tokenURI) internal {
@@ -43,8 +41,8 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
         return nftId;
     }
     
-    function batchMint(address recipient, string[] memory _tokenURIArry)  external  returns (uint256[] memory) {
-         // require(msg.value == 0.5 ether);
+    function batchMint(address recipient, string[] memory _tokenURIArry)  external  returns (uint256[] memory) {        
+        require(_tokenURIArry.length > 0, "Invalid arguments, no uris." );
         uint256 len = _tokenURIArry.length;
         uint256 i; 
         uint256[] memory nftIds = new uint256[](len);
