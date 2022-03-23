@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -11,9 +11,19 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
     Counters.Counter private _tokenIds;
 
     mapping(string => uint256) _getNFTId;
+    string base_uri;
 
     constructor() ERC721("EvoBullNFT", "EBNFT") {
+        base_uri = "https://ipfs.infura.io/ipfs/QmZAQMqPBHTifSe1jGoCex3We2DAwGVsLpHARr5Sis5EnV/";
+    }
 
+    function getBaseuri() public view returns(string memory){
+        return base_uri;
+    }
+
+    function setBaseUri(string memory _newUri) external returns(string memory){
+        base_uri = _newUri;
+        return base_uri;
     }
 
     function tranferNFT(address _from, address _to, string memory _tokenUri) external payable {
@@ -36,7 +46,8 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
         uint256 nftId = _tokenIds.current(); 
         _mint(recipient, nftId);
         _getNFTId[_tokenURI] = nftId;
-        setTokenURI(nftId, _tokenURI);
+        string memory fullUri = string.concat(base_uri, _tokenURI);
+        setTokenURI(nftId, fullUri);
 
         return nftId;
     }
@@ -46,6 +57,7 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
         uint256 len = _tokenURIArry.length;
         uint256 i; 
         uint256[] memory nftIds = new uint256[](len);
+        string memory fullUri;
         for(i = 0; i < len; i++)
         {
             _tokenIds.increment();
@@ -53,7 +65,8 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
             uint256 nftId = _tokenIds.current(); 
             _mint(recipient, nftId);
             _getNFTId[_tokenURIArry[i]] = nftId;
-            setTokenURI(nftId, _tokenURIArry[i]);
+            fullUri = string.concat(base_uri, _tokenURIArry[i]);
+            setTokenURI(nftId, fullUri);
             nftIds[i] = nftId;
         }
         return nftIds;

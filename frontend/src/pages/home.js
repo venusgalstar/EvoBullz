@@ -1,5 +1,5 @@
 
-import {  useState } from 'react';
+import {  useState , useEffect } from 'react';
 import Slider from '@mui/material/Slider';
 import { NotificationManager } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
@@ -7,6 +7,11 @@ import Button from '@mui/material/Button';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { styled } from '@mui/material/styles';
 import Web3 from 'web3';
+import axios from 'axios';
+import config from '../config';
+import {useDispatch} from "react-redux";
+import { setEvoNFTList } from '../store/actions/nft.actions';
+import { useNavigate} from "@reach/router";
 
 const connectTheme = createTheme({
   palette: {
@@ -79,6 +84,10 @@ function Home() {
 
   const [count, setCount] = useState(5);
   const [account, setAccount] = useState();
+  const [nftItems, setNFTItems] = useState([]);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (event, newValue) => {
     setCount(newValue);
@@ -94,6 +103,32 @@ function Home() {
       console.log("account", accounts[0]);
     })
   }
+
+  useEffect(() => 
+  {
+    if(!account) return;
+    async function init() {
+      const res = await axios.get("https://deep-index.moralis.io/api/v2/" + account + "/nft?chain=bsc%20testnet&format=decimal", {
+        headers: { "X-API-Key": "YEEwMh0B4VRg6Hu5gFQcKxqinJ7UizRza1JpbkyMgNTfj4jUkSaZVajOxLNabvnt" },
+      });
+      //console.log(res.data.result);
+      const nftlist = res.data.result;
+      if(nftlist && nftlist.length>0)
+      {
+        let nftItems = [];
+        nftlist.forEach(item => {
+          if(item.token_address.toLowerCase() === config.EvoNFTContractAddress.toLowerCase() ) 
+            nftItems.push(item);
+        });
+
+        setNFTItems(nftItems);
+        dispatch(setEvoNFTList(nftItems));
+
+        console.log("nftItems = ", nftItems);
+      }
+    }
+    init();
+  }, [account])
 
   const onClickMint = () => {
     NotificationManager.info('Please connect wallet', "", 2000);
@@ -200,7 +235,7 @@ function Home() {
               </ThemeProvider>
               <div style={{ width: "80px" }}></div>
               <ThemeProvider theme={loadmapTheme}>
-                <Button variant="contained" color="primary" className='btn_collection' >View Collection</Button>
+                <Button variant="contained" color="primary" className='btn_collection' onClick={() => {navigate("/staking")}}>View Collection</Button>
               </ThemeProvider>
             </div>
           </div>

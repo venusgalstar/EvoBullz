@@ -45,6 +45,18 @@ const Upload = ({ asset_id = null }) => {
     }
   }
 
+  // my-nft.json
+  // {   
+  //    "description": "Friendly OpenSea Creature",      
+  //    "image": "https://opensea-prod.appspot.com/puffs/3.png",  
+  //    "name": "Dave Starbelly",   
+  //    "attributes": [
+  //        { "trait_type": "Base", "value": "Starfish" },      
+  //        { "trait_type": "Eyes", "value": "Big" },      
+  //        { "trait_type": "Mouth","value": "Surprised" },
+  //    ]
+  // }
+
 //   const saveMultipleItem = (params, paths) => {
 //     //setCreatingStep(4);
 //     let names = []; let i;

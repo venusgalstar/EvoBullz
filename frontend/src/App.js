@@ -3,6 +3,7 @@ import { Router, Location, Redirect } from '@reach/router';
 import ScrollToTopBtn from './menu/ScrollToTop';
 import Header from './menu/header';
 import Home from './pages/home';
+import Staking from './pages/staking';
 
 import { createGlobalStyle } from 'styled-components';
 import { NotificationContainer } from 'react-notifications';
@@ -43,6 +44,7 @@ const app= () => (
           <Redirect to="/home" />
         </Home>
         {/* <ItemDetailRedux path="/ItemDetail/:nftId" /> */}
+        <Staking path="/staking" />
         </ScrollTop>
       </PosedRouter>
     <ScrollToTopBtn />

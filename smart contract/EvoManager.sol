@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^ 0.8.10;
+pragma solidity ^ 0.8.13;
 
 import "./EvoBullNFT.sol";
 import "./EvoToken.sol";
@@ -37,7 +37,8 @@ contract EvoManager is Ownable {
     event SingleMintingHappend(address addr, string tokenUri);
     event MultipleMintingHappend(address addr, string[] tokenUris);
     event OwnerIsChanged(address addr);
-    event transferFunds(address addr, uint256 amount, uint8 kind);
+    event TransferFunds(address addr, uint256 amount, uint8 kind);
+    event EvoCollectionUriChanged(address addr, string collectionUri);
     
     constructor(address _nftAddress, address _evoAddress, uint256 _minFee) {
         evoManagerAddress = msg.sender;
@@ -61,6 +62,17 @@ contract EvoManager is Ownable {
         _status = true;
         _;
         _status = false;
+    }
+
+    function getEvoCollectionUri() public returns(string memory){
+        evoNFT = EvoBullNFT(evoNFTaddress);
+        return evoNFT.getBaseuri();
+    }
+
+    function setEvoCollectionUri(string memory _newUri) external onlyOwner returns(string memory){        
+        evoNFT = EvoBullNFT(evoNFTaddress);
+        emit EvoCollectionUriChanged(msg.sender, _newUri);
+        return evoNFT.setBaseUri(_newUri);
     }
 
     function setEvoNFTaddress(address _addr) external onlyOwner{
@@ -151,7 +163,7 @@ contract EvoManager is Ownable {
             evoToken = EvoToken(evoTokenAddress);
           evoToken.transfer(_to, _amount);
         }
-        emit transferFunds(_to, _amount, _kind);
+        emit TransferFunds(_to, _amount, _kind);
     }
 
     function withDraw(uint256 _amount, uint8 _kind) external onlyOwner {

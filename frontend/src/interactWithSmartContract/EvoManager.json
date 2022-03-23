@@ -70,6 +70,25 @@
 			},
 			{
 				"indexed": false,
+				"internalType": "string",
+				"name": "collectionUri",
+				"type": "string"
+			}
+		],
+		"name": "EvoCollectionUriChanged",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"indexed": false,
 				"internalType": "uint256",
 				"name": "amount",
 				"type": "uint256"
@@ -189,12 +208,25 @@
 				"type": "uint8"
 			}
 		],
-		"name": "transferFunds",
+		"name": "TransferFunds",
 		"type": "event"
 	},
 	{
 		"stateMutability": "payable",
 		"type": "fallback"
+	},
+	{
+		"inputs": [],
+		"name": "getEvoCollectionUri",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [],
@@ -343,6 +375,25 @@
 		"inputs": [],
 		"name": "renounceOwnership",
 		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_newUri",
+				"type": "string"
+			}
+		],
+		"name": "setEvoCollectionUri",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
