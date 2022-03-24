@@ -4,10 +4,13 @@ import ScrollToTopBtn from './menu/ScrollToTop';
 import Header from './menu/header';
 import Home from './pages/home';
 import Staking from './pages/staking';
+import { loadWeb3 } from './interactWithSmartContract';
 
 import { createGlobalStyle } from 'styled-components';
 import { NotificationContainer } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
+
+loadWeb3();
 
 const GlobalStyles = createGlobalStyle`
   :root {

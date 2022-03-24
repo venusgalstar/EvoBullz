@@ -1,3 +1,9 @@
+import Web3 from "web3";
+import store from '../store';
+import config from "../config";
+import create from "ipfs-http-client";
+import {setConnectedWalletAddress, setWalletStatus, setConnectedChainId, updateBalanceOfUser} from "../store/actions/auth.actions"; 
+import { setNFTTradingResult } from "../store/actions/nft.actions";
 
 export const loadWeb3 = async () => 
 {
@@ -79,7 +85,7 @@ const changeNetwork = async () =>
             params: [
               {
                 chainId: window.web3.utils.toHex(config.chainId),
-                chainName: 'Avalanche',
+                chainName: 'Cronos',
                 rpcUrls: [config.testNetUrl] /* ... */,
               },
             ],
@@ -256,8 +262,6 @@ const parseErrorMsg = (errMsg) =>
   return returStr;
 }
 
-
-
 export const createNftFile = async (file, title, description) => {
     const client = create('https://ipfs.infura.io:5001/api/v0')
     try {
@@ -265,13 +269,13 @@ export const createNftFile = async (file, title, description) => {
       const metadata = JSON.stringify({
         name: title,
         description: description,
-        image: api.ipfsUrl + image_hash.cid.toString()
+        image: config.ipfsUrl + image_hash.cid.toString()
       });
       const meta_hash = await client.add(metadata);
-      const token_uri = api.ipfsUrl + meta_hash.cid.toString();
+      const token_uri = config.ipfsUrl + meta_hash.cid.toString();
       return {
         success: true,
-        image_uri: api.ipfsUrl + image_hash.cid.toString(),
+        image_uri: config.ipfsUrl + image_hash.cid.toString(),
         token_uri: token_uri
       }
     } catch (error) {
@@ -282,3 +286,47 @@ export const createNftFile = async (file, title, description) => {
     }
   };
 
+  export const mintMultipleNFT = async (currentAddr, tokenUris, fee) => 
+  {
+    /*
+     Multiple mint :  mintMultipleNFT(string[] memory tokenUris)
+    */
+      
+    try 
+    {
+      let EvoManagerContract = await new window.web3.eth.Contract(config.EvoManagerContractAbi, config.EvoManagerContractAddress);
+      let minting_fee = window.web3.utils.toWei(fee !== null ? fee.toString() : '0', 'ether');
+      
+      var mintMultipleNFT = EvoManagerContract.methods.mintMultipleNFT(tokenUris);
+      let gasFee = await mintMultipleNFT.estimateGas({ from: currentAddr, value: minting_fee });
+      var balanceOfUser = await window.web3.eth.getBalance(currentAddr);
+      var gasPrice = 30 * (10 ** 9);
+  
+      if (balanceOfUser <= gasFee * gasPrice) {
+        store.dispatch(setNFTTradingResult("mintMultipleNFT", false, "Insufficient balance." ));
+      
+        return {
+          success : false,
+          message : "Insufficient balance."
+        }
+      }
+      await mintMultipleNFT.send({ from: currentAddr, value: minting_fee });
+  
+      store.dispatch(setNFTTradingResult("mintMultipleNFT", true, "Succeed in put on sale"));
+  
+      updateUserBalanceAfterTrading(currentAddr);
+  
+      return {
+        success : true,
+        message : "Succeed on minting a item"
+      }
+    } catch (error) {
+      store.dispatch(setNFTTradingResult("mintMultipleNFT", false, parseErrorMsg(error.message) ));
+  
+      return {
+        success : false,
+        message : parseErrorMsg(error.message)
+      }
+    }
+  }
+  
