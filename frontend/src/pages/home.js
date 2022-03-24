@@ -1,25 +1,15 @@
 
-import {  useState , useEffect } from 'react';
+import {  useState, useEffect } from 'react';
 import Slider from '@mui/material/Slider';
 import { NotificationManager } from 'react-notifications';
-import 'react-notifications/lib/notifications.css';
 import Button from '@mui/material/Button';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { styled } from '@mui/material/styles';
-import Web3 from 'web3';
-import axios from 'axios';
-import config from '../config';
-import {useDispatch} from "react-redux";
-import { setEvoNFTList } from '../store/actions/nft.actions';
 import { useNavigate} from "@reach/router";
-
-const connectTheme = createTheme({
-  palette: {
-    primary: {
-      main: "#ffbd59",
-    },
-  },
-});
+import { useSelector, useDispatch } from "react-redux";
+import { getUsersEvoNFTs, mintMultipleNFT } from '../interactWithSmartContract';
+import isEmpty from '../utilities/isEmpty';
+import { emptyNFTTradingResult } from '../store/actions/nft.actions';
 
 const mintTheme = createTheme({
   palette: {
@@ -36,7 +26,6 @@ const loadmapTheme = createTheme({
     }
   }
 })
-
 
 const PrettoSlider = styled(Slider)({
   color: '#ff9a3d',
@@ -78,14 +67,13 @@ const PrettoSlider = styled(Slider)({
   },
 });
  
-const web3 = new Web3();
-
 function Home() {
 
   const [count, setCount] = useState(5);
-  const [account, setAccount] = useState();
-  const [nftItems, setNFTItems] = useState([]);
 
+  const account = useSelector( state => state.auth.currentWallet );
+  const nftOperationResult = useSelector( state => state.nft.tradingResult );
+  const walletStatus = useSelector(state => state.auth.walletStatus);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -93,54 +81,36 @@ function Home() {
     setCount(newValue);
   };
 
-  const connectWallet = async () => {
-    // var web3 = new Web3(web3)
-    await window.ethereum.enable();
-    // const provider = Web3.providers.HttpProvider(config.testNetUrl);
-    const web3 = new Web3(Web3.givenProvider);
-    web3.eth.getAccounts((err, accounts) => {
-      setAccount(accounts[0]);
-      console.log("account", accounts[0]);
-    })
-  }
-
-  useEffect(() => 
-  {
-    if(!account) return;
-    async function init() {
-      const res = await axios.get("https://deep-index.moralis.io/api/v2/" + account + "/nft?chain=bsc%20testnet&format=decimal", {
-        headers: { "X-API-Key": "YEEwMh0B4VRg6Hu5gFQcKxqinJ7UizRza1JpbkyMgNTfj4jUkSaZVajOxLNabvnt" },
-      });
-      //console.log(res.data.result);
-      const nftlist = res.data.result;
-      if(nftlist && nftlist.length>0)
+  useEffect( () => {
+    if(!isEmpty(nftOperationResult))
+    {
+      switch(nftOperationResult.function)
       {
-        let nftItems = [];
-        nftlist.forEach(item => {
-          if(item.token_address.toLowerCase() === config.EvoNFTContractAddress.toLowerCase() ) 
-            nftItems.push(item);
-        });
-
-        setNFTItems(nftItems);
-        dispatch(setEvoNFTList(nftItems));
-
-        console.log("nftItems = ", nftItems);
+        default:
+          break;
+        case "mintMultipleNFT":
+          if(nftOperationResult.success === true) 
+          {            
+            NotificationManager.success(nftOperationResult.message, "Success", 2000);
+          }
+          if(nftOperationResult.success === false) NotificationManager.error(nftOperationResult.message, "Error", 2000);
+          dispatch(emptyNFTTradingResult());
+          setTimeout(() => 
+          {           
+            getUsersEvoNFTs(account);
+          }, 3000)
+          break;
       }
     }
-    init();
-  }, [account])
+  }, [nftOperationResult, account, dispatch])
 
-  const onClickMint = () => {
-    NotificationManager.info('Please connect wallet', "", 2000);
+  const onClickMint = async () => {
+    if( !isEmpty(account) && walletStatus === true) await mintMultipleNFT(account, ["2", "3", "4"], 0.15);
+    else NotificationManager.warning("Please connect your wallet.", "Warning",  2000)
   }
 
   return (
     <>
-      <div className='header padder-50' style={{ justifyContent: "flex-end" }}>
-        <ThemeProvider theme={connectTheme}>
-          <Button variant="contained" color="primary" className="btn_connect" onClick={connectWallet}>Connect Wallet</Button>
-        </ThemeProvider>
-      </div>
       <div id='section_mint'>
         <div style={{ marginBottom: "20px" }}>
           <div className='mint-title' >

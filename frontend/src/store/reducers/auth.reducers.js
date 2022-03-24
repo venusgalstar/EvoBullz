@@ -1,4 +1,4 @@
-import { AUTH_LOGOUT, AUTH_SUCCESS, GET_USER_DETAIL, SET_WALLET_ADDR, UPDATE_WALLET_STATUS, UPDATE_USER_BALANCE, SET_OTHER_USER_DETAIL, SET_CHAIN_ID, CURRENT_USER } from "../actions/action.types";
+import { AUTH_LOGOUT, AUTH_SUCCESS, GET_USER_DETAIL, SET_WALLET_ADDR, UPDATE_WALLET_STATUS, SET_AVAX_PRICE, UPDATE_USER_BALANCE, SET_OTHER_USER_DETAIL, SET_CHAIN_ID, CURRENT_USER } from "../actions/action.types";
 
 const auth = {
     user: {},
@@ -12,6 +12,8 @@ const auth = {
 export function Auth(state = auth, action) 
 {
     switch (action.type) {
+        case SET_AVAX_PRICE:
+            return {...state, ...action.payload};
         case AUTH_SUCCESS:
 
             // console.log("[AUTH_SUCCESS reducer] payload = ", action.payload);
