@@ -4,30 +4,29 @@ pragma solidity ^ 0.8.13;
 import "./EvoBullNFT.sol";
 import "./EvoToken.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract EvoManager is Ownable {
 
-    struct StakingInfo {
+    using SafeMath for uint256;
+
+    struct UserInfo {
         uint256 tokenId;
-        address currentOwner;
-        uint256 startTime;
-        uint256 interval;
-        uint24 royaltyRatio;
+        uint256 startBlock;
     }
 
     address evoManagerAddress;
     address evoNFTaddress;
     address evoTokenAddress;
-    EvoBullNFT evoNFT;
-    EvoToken evoToken;
 
     uint _StakingIdCounter;
     bool _status;
     uint256 private _mintingFee;
+    uint256 public RewardTokenPerBlock;
 
-    mapping(uint => StakingInfo) _allStakingInfo;
-    mapping(string => uint) _getStakingId;
     mapping(string => bool) _tokenHashExists;
+    mapping(address => UserInfo[]) public userInfo;
+    mapping(address => uint256) public stakingAmount;
 
     event Received(address addr, uint amount);
     event Fallback(address addr, uint amount);
@@ -39,6 +38,8 @@ contract EvoManager is Ownable {
     event OwnerIsChanged(address addr);
     event TransferFunds(address addr, uint256 amount, uint8 kind);
     event EvoCollectionUriChanged(address addr, string collectionUri);
+    event Stake(address indexed user, uint256 amount);
+    event UnStake(address indexed user, uint256 amount);
     
     constructor(address _nftAddress, address _evoAddress, uint256 _minFee) {
         evoManagerAddress = msg.sender;
@@ -47,6 +48,7 @@ contract EvoManager is Ownable {
         _mintingFee = _minFee;
         _StakingIdCounter = 0;
         _status = false;
+        RewardTokenPerBlock = 40 ether;
     }
 
     receive() external payable {
@@ -64,15 +66,13 @@ contract EvoManager is Ownable {
         _status = false;
     }
 
-    function getEvoCollectionUri() public returns(string memory){
-        evoNFT = EvoBullNFT(evoNFTaddress);
-        return evoNFT.getBaseuri();
+    function getEvoCollectionUri() public view returns(string memory){
+        return EvoBullNFT(evoNFTaddress).getBaseuri();
     }
 
-    function setEvoCollectionUri(string memory _newUri) external onlyOwner returns(string memory){        
-        evoNFT = EvoBullNFT(evoNFTaddress);
+    function setEvoCollectionUri(string memory _newUri) external onlyOwner returns(string memory){      
         emit EvoCollectionUriChanged(msg.sender, _newUri);
-        return evoNFT.setBaseUri(_newUri);
+        return EvoBullNFT(evoNFTaddress).setBaseUri(_newUri);
     }
 
     function setEvoNFTaddress(address _addr) external onlyOwner{
@@ -108,8 +108,7 @@ contract EvoManager is Ownable {
     function mintSingleNFT(string memory _tokenHash) external payable nonReentrant {
         require(msg.value >= _mintingFee, "Invalid price, price is less than minting fee.");
         require(!_tokenHashExists[_tokenHash], "Existing NFT hash value....");
-        evoNFT = EvoBullNFT(evoNFTaddress);
-        evoNFT.mint(msg.sender, _tokenHash);
+        EvoBullNFT(evoNFTaddress).mint(msg.sender, _tokenHash);
         _tokenHashExists[_tokenHash] = true;
         emit SingleMintingHappend(msg.sender, _tokenHash);
     }
@@ -123,25 +122,17 @@ contract EvoManager is Ownable {
             require(!_tokenHashExists[_tokenHashs[i]], "Existing NFT hash value....");
             _tokenHashExists[_tokenHashs[i]] = true;
         }
-        evoNFT = EvoBullNFT(evoNFTaddress);
-        evoNFT.batchMint(msg.sender, _tokenHashs);     
+        EvoBullNFT(evoNFTaddress).batchMint(msg.sender, _tokenHashs);     
         emit MultipleMintingHappend(msg.sender, _tokenHashs);   
     }
     
-    function getStakingInfo(string memory _tokenHash) public view returns (StakingInfo memory) {
-        require(_tokenHashExists[_tokenHash], "Non-Existing NFT hash value....");
-
-        return _allStakingInfo[_getStakingId[_tokenHash]];
-    }
-
-    function getWithdrawBalance(uint8 _kind) public  returns (uint256) {
+    function getWithdrawBalance(uint8 _kind) public  view returns (uint256) {
         require(_kind >= 0, "Invalid cryptocurrency...");
 
         if (_kind == 0) {
           return address(this).balance;
         } else {
-            evoToken = EvoToken(evoTokenAddress);
-          return evoToken.balanceOf(address(this));
+          return EvoToken(evoTokenAddress).balanceOf(address(this));
         }
     }
 
@@ -160,8 +151,7 @@ contract EvoManager is Ownable {
         if (_kind == 0) {
           _to.transfer(_amount);
         } else {
-            evoToken = EvoToken(evoTokenAddress);
-          evoToken.transfer(_to, _amount);
+          EvoToken(evoTokenAddress).transfer(_to, _amount);
         }
         emit TransferFunds(_to, _amount, _kind);
     }
@@ -180,6 +170,134 @@ contract EvoManager is Ownable {
         require(remaining > 0, "None left to withdraw...");
 
         customizedTransfer(payable(msg.sender), remaining, _kind);
+    }
+
+    function changeRewardTokenPerBlock(uint256 _RewardTokenPerBlock) public {
+        RewardTokenPerBlock = _RewardTokenPerBlock;
+    }
+
+    function pendingReward(address _user, uint256 _tokenId) public view returns (uint256) 
+    {
+        (bool _isStaked, uint256 _startBlock) = getStakingItemInfo(_user, _tokenId);
+        if(!_isStaked) return 0;
+        uint256 currentBlock = block.number;
+
+        uint256 rewardAmount = (currentBlock.sub(_startBlock)).mul(RewardTokenPerBlock);
+        if(userInfo[_user].length >= 5) rewardAmount = rewardAmount.mul(3).div(2);
+        return rewardAmount;
+    }
+
+    function getStakingInfoOfUser(address _user) public view returns(uint256[] memory , uint256[] memory , string[] memory)
+    {
+        uint256[] memory nftIds = new uint256[](userInfo[_user].length);
+        uint256[] memory rewards = new uint256[](userInfo[_user].length);
+        string[] memory tokenUris = new string[](userInfo[_user].length);
+        uint256 tempId;
+        for (uint256 i = 0; i < userInfo[_user].length; i++) 
+        {
+            tempId = userInfo[_user][i].tokenId;
+            nftIds[i] = tempId;
+            rewards[i] = pendingReward(_user, tempId);
+            tokenUris[i] = EvoBullNFT(evoNFTaddress).tokenURI(tempId);
+        }
+        return (nftIds, rewards, tokenUris);
+    }
+
+    function getTokenURIsFromIds(uint256[] memory _tokenIds) public view returns(string[] memory)
+    {        
+        string[] memory tokenUris = new string[](_tokenIds.length);   
+        for (uint256 i = 0; i < _tokenIds.length; i++) 
+        {
+            tokenUris[i] = EvoBullNFT(evoNFTaddress).tokenURI(_tokenIds[i]);
+        }
+        return tokenUris;
+    }
+
+    function pendingTotalReward(address _user) public view returns(uint256) 
+    {
+        uint256 pending = 0;
+        for (uint256 i = 0; i < userInfo[_user].length; i++) {
+            uint256 temp = pendingReward(_user, userInfo[_user][i].tokenId);
+            pending = pending.add(temp);
+        }
+        return pending;
+    }
+
+    function stake(uint256[] memory tokenIds) public 
+    {
+        for(uint256 i = 0; i < tokenIds.length; i++) 
+        {
+            (bool _isStaked,) = getStakingItemInfo(msg.sender, tokenIds[i]);
+            if(_isStaked) continue;
+            if(EvoBullNFT(evoNFTaddress).ownerOf(tokenIds[i]) != msg.sender) continue;
+
+            EvoBullNFT(evoNFTaddress).transferFrom(address(msg.sender), address(this), tokenIds[i]);
+
+            UserInfo memory info;
+            info.tokenId = tokenIds[i];
+            info.startBlock = block.number;
+
+            userInfo[msg.sender].push(info);
+            stakingAmount[msg.sender] = stakingAmount[msg.sender] + 1;
+            emit Stake(msg.sender, 1);
+        }
+    }
+
+    function unstake(uint256[] memory tokenIds) public 
+    {
+        uint256 pending = 0;
+        for(uint256 i = 0; i < tokenIds.length; i++) 
+        {
+            (bool _isStaked,) = getStakingItemInfo(msg.sender, tokenIds[i]);
+            if(!_isStaked) continue;
+            if( EvoBullNFT(evoNFTaddress).ownerOf(tokenIds[i]) != address(this) ) continue;
+
+            uint256 temp = pendingReward(msg.sender, tokenIds[i]);
+            pending = pending.add(temp);
+            
+            removeFromUserInfo(tokenIds[i]);
+            if(stakingAmount[msg.sender] > 0)
+                stakingAmount[msg.sender] = stakingAmount[msg.sender] - 1;
+            EvoBullNFT(evoNFTaddress).transferFrom(address(this), msg.sender, tokenIds[i]);
+            emit UnStake(msg.sender, 1);
+        }
+
+        if(pending > 0) {
+            EvoToken(evoTokenAddress).transfer(msg.sender, pending);
+        }
+    }
+
+    function getStakingItemInfo(address _user, uint256 _tokenId) public view returns(bool _isStaked, uint256 _startBlock) 
+    {
+        for(uint256 i = 0; i < userInfo[_user].length; i++) 
+        {
+            if(userInfo[_user][i].tokenId == _tokenId) {
+                _isStaked = true;
+                _startBlock = userInfo[_user][i].startBlock;
+                break;
+            }
+        }
+    }
+
+    function removeFromUserInfo(uint256 tokenId) private 
+    {        
+        for (uint256 i = 0; i < userInfo[msg.sender].length; i++) {
+            if (userInfo[msg.sender][i].tokenId == tokenId) {
+                userInfo[msg.sender][i] = userInfo[msg.sender][userInfo[msg.sender].length - 1];
+                userInfo[msg.sender].pop();
+                break;
+            }
+        }        
+    }
+
+    function claim() public 
+    {
+        uint256 reward = pendingTotalReward(msg.sender);
+
+        for (uint256 i = 0; i < userInfo[msg.sender].length; i++)
+            userInfo[msg.sender][i].startBlock = block.number;
+
+        EvoToken(evoTokenAddress).transfer(msg.sender, reward);
     }
 
 }

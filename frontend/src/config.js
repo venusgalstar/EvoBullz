@@ -1,4 +1,4 @@
-var NFT_abi = require("./interactWithSmartContract/EvoBullNFT.json");
+var evoNFT_abi = require("./interactWithSmartContract/EvoBullNFT.json");
 var evoManager_abi = require("./interactWithSmartContract/EvoManager.json");
 var evoToken_abi = require("./interactWithSmartContract/EvoToken.json");
 var config = {
@@ -9,10 +9,11 @@ var config = {
     ipfsUrl: 'https://ipfs.infura.io/ipfs/',
     mainNetUrl: 'https://evm-cronos.crypto.org/',
     testNetUrl:  "https://data-seed-prebsc-1-s2.binance.org:8545/", 
-    EvoNFTContractAddress : "0xE2Ee894EC56A80B8dBff5c8Cf3a2231594c2de98", //"0xdb94eA3522060c0283c681Ea645A1936C77A6EEb",
-    EvoTokenContractAddress : "0x11dC21a7D5343B8AaAECEf61D763041761f42772",
-    EvoManagerContractAddress : "0x08338772648BC2C9F93770C5e9723A759b1A201C",
-    EvoNFTContractAbi : NFT_abi,
+    EvoNFTContractAddress : "0x96C9E343855e2a2b5a4A513920e81CD61463a830", 
+    EvoTokenContractAddress : "0x003DC66C355f8296902835d0a80F927fC3bBF58D",
+    EvoManagerContractAddress : "0x50F450db72Dfa4eccAad9c53D1F44E2B8eD13d01",
+    MoralisAPIKey: "YEEwMh0B4VRg6Hu5gFQcKxqinJ7UizRza1JpbkyMgNTfj4jUkSaZVajOxLNabvnt",
+    EvoNFTContractAbi : evoNFT_abi,
     EvoTokenContractAbi : evoToken_abi,
     EvoManagerContractAbi : evoManager_abi
 }

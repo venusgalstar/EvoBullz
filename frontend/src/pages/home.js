@@ -2,13 +2,12 @@
 import {  useState, useEffect } from 'react';
 import Slider from '@mui/material/Slider';
 import { NotificationManager } from 'react-notifications';
-import 'react-notifications/lib/notifications.css';
 import Button from '@mui/material/Button';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { styled } from '@mui/material/styles';
 import { useNavigate} from "@reach/router";
 import { useSelector, useDispatch } from "react-redux";
-import { mintMultipleNFT } from '../interactWithSmartContract';
+import { getUsersEvoNFTs, mintMultipleNFT } from '../interactWithSmartContract';
 import isEmpty from '../utilities/isEmpty';
 import { emptyNFTTradingResult } from '../store/actions/nft.actions';
 
@@ -74,6 +73,7 @@ function Home() {
 
   const account = useSelector( state => state.auth.currentWallet );
   const nftOperationResult = useSelector( state => state.nft.tradingResult );
+  const walletStatus = useSelector(state => state.auth.walletStatus);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -81,7 +81,7 @@ function Home() {
     setCount(newValue);
   };
 
-  useEffect(() => {
+  useEffect( () => {
     if(!isEmpty(nftOperationResult))
     {
       switch(nftOperationResult.function)
@@ -91,17 +91,21 @@ function Home() {
         case "mintMultipleNFT":
           if(nftOperationResult.success === true) 
           {            
-            NotificationManager.success(nftOperationResult.message, 2000);
+            NotificationManager.success(nftOperationResult.message, "Success", 2000);
           }
           if(nftOperationResult.success === false) NotificationManager.error(nftOperationResult.message, "Error", 2000);
           dispatch(emptyNFTTradingResult());
+          setTimeout(() => 
+          {           
+            getUsersEvoNFTs(account);
+          }, 3000)
           break;
       }
     }
-  }, [nftOperationResult, dispatch])
+  }, [nftOperationResult, account, dispatch])
 
   const onClickMint = async () => {
-    if(!isEmpty(account)) await mintMultipleNFT(account, ["2", "3", "4"], 0.15);
+    if( !isEmpty(account) && walletStatus === true) await mintMultipleNFT(account, ["2", "3", "4"], 0.15);
     else NotificationManager.warning("Please connect your wallet.", "Warning",  2000)
   }
 

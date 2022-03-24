@@ -3,11 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import isEmpty from "../utilities/isEmpty";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Button } from "@mui/material";
-import { connectWallet } from '../interactWithSmartContract';
+import { connectWallet, getUsersEvoNFTs } from '../interactWithSmartContract';
 import { setConnectedWalletAddress } from '../store/actions/auth.actions';
-import { setEvoNFTList } from '../store/actions/nft.actions';
-import axios from 'axios';
-import config from '../config';
 
 const connectTheme = createTheme({
     palette: {
@@ -23,16 +20,7 @@ const Header= function() {
 
   const account = useSelector(state => state.auth.currentWallet);
   const walletStatus = useSelector(state => state.auth.walletStatus);
-  const nftOperationResult = useSelector( state => state.nft.tradingResult );
   const dispatch = useDispatch();
-
-  useEffect(() =>
-  {    
-    if(isEmpty(account)) return;
-    let compAddress = "";
-    compAddress = account.substring(0, 6)+"..."+account.substring(account.length-4, account.length);
-    setCompressedAddress(compAddress);
-  }, [account])
 
   const ConnectWallet = async () => {
     let connection = await connectWallet();
@@ -49,25 +37,10 @@ const Header= function() {
     if(isEmpty(account)) return;
     let compAddress = "";
     compAddress = account.substring(0, 6)+"..."+account.substring(account.length-4, account.length);
-    setCompressedAddress(compAddress);
-    async function init() {
-      const res = await axios.get("https://deep-index.moralis.io/api/v2/" + account + "/nft/" + config.EvoNFTContractAddress + "?chain=bsc%20testnet&format=decimal", {
-        headers: { "X-API-Key": "YEEwMh0B4VRg6Hu5gFQcKxqinJ7UizRza1JpbkyMgNTfj4jUkSaZVajOxLNabvnt" },
-      });
-      const nftlist = res.data.result;
-      if(nftlist && nftlist.length>0)
-      {
-        let nftItems = [];
-        nftlist.forEach(item => {
-          if(item.token_address.toLowerCase() === config.EvoNFTContractAddress.toLowerCase() ) 
-            nftItems.push(item);
-        });
-
-        dispatch(setEvoNFTList(nftItems));
-      }
-    }
-    init();
-  }, [account, nftOperationResult, dispatch])
+    setCompressedAddress(compAddress);  
+    getUsersEvoNFTs(account);
+    
+  }, [account, dispatch])
 
   return (
      <div className='header padder-50' style={{ justifyContent: "flex-end" }}>
@@ -78,4 +51,5 @@ const Header= function() {
       </div>
     );
 }
+
 export default Header;
