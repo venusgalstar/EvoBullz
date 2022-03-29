@@ -23,6 +23,7 @@ contract EvoManager is Ownable {
     bool _status;
     uint256 private _mintingFee;
     uint256 public RewardTokenPerBlock;
+    uint256 private collectionMaxNFTNumber;
 
     mapping(string => bool) _tokenHashExists;
     mapping(address => UserInfo[]) public userInfo;
@@ -33,16 +34,17 @@ contract EvoManager is Ownable {
     event ChangeEvoNFTAddress(address newddr);
     event ChangeEvoTokenAddress(address newddr);
     event ChangeMintingFee(uint256 fee);
-    event SingleMintingHappend(address addr, string tokenUri);
-    event MultipleMintingHappend(address addr, string[] tokenUris);
+    event SingleMintingHappend(address addr);
+    event MultipleMintingHappend(address addr, uint256 count);
     event OwnerIsChanged(address addr);
     event TransferFunds(address addr, uint256 amount, uint8 kind);
     event EvoCollectionUriChanged(address addr, string collectionUri);
     event Stake(address indexed user, uint256 amount);
     event UnStake(address indexed user, uint256 amount);
     event ChangeMintingCounterValue(uint256 count);
+    event ChangeCollectionNFTNumber(uint256 amount);
     
-    constructor(address _nftAddress, address _evoAddress, uint256 _minFee) {
+    constructor(address _nftAddress, address _evoAddress, uint256 _minFee, uint256 _maxNFTNumber) {
         evoManagerAddress = msg.sender;
         evoNFTaddress = _nftAddress;
         evoTokenAddress = _evoAddress;
@@ -50,6 +52,7 @@ contract EvoManager is Ownable {
         _MintedNFTCounter = 0;
         _status = false;
         RewardTokenPerBlock = 40 ether;
+        collectionMaxNFTNumber = _maxNFTNumber;
     }
 
     receive() external payable {
@@ -105,7 +108,17 @@ contract EvoManager is Ownable {
     function getMintingFee()  view external returns(uint256) {
         return _mintingFee;
     }
-    
+
+    function setMaxNftNumber(uint256 _amount) external onlyOwner {
+        require(_amount >= 0, "Invalid max number.");
+        collectionMaxNFTNumber = _amount;
+        emit ChangeCollectionNFTNumber(collectionMaxNFTNumber);
+    }
+
+    function getMaxNftNumber()  view external returns(uint256) {
+        return collectionMaxNFTNumber;
+    }
+
     function setMintedNFTCount(uint256 _count) external onlyOwner {
         require(_count >= 0, "Invalid count value");
         _MintedNFTCounter = _count;
@@ -116,27 +129,21 @@ contract EvoManager is Ownable {
         return _MintedNFTCounter;
     }
 
-    function mintSingleNFT(string memory _tokenHash) external payable nonReentrant {
+    function mintSingleNFT() external payable nonReentrant {
         require(msg.value >= _mintingFee, "Invalid price, price is less than minting fee.");
-        require(!_tokenHashExists[_tokenHash], "Existing NFT hash value....");
-        EvoBullNFT(evoNFTaddress).mint(msg.sender, _tokenHash);
-        _tokenHashExists[_tokenHash] = true;
+        require(_MintedNFTCounter < collectionMaxNFTNumber, "Exceed Max NFT number.");
+        EvoBullNFT(evoNFTaddress).mint(msg.sender);
         _MintedNFTCounter++;
-        emit SingleMintingHappend(msg.sender, _tokenHash);
+        emit SingleMintingHappend(msg.sender);
     }
 
-    function mintMultipleNFT(string[] memory _tokenHashs) external payable nonReentrant {
-        require(_tokenHashs.length > 0, "Invalid arguments, no hashes." );        
-        require(msg.value >= _mintingFee * _tokenHashs.length, "Invalid price, price is less than minting fee * countOfUris");
-        uint256 i;
-        for (i = 0; i < _tokenHashs.length; i++) 
-        {
-            require(!_tokenHashExists[_tokenHashs[i]], "Existing NFT hash value....");
-            _tokenHashExists[_tokenHashs[i]] = true;
-        }
-        EvoBullNFT(evoNFTaddress).batchMint(msg.sender, _tokenHashs);  
-        _MintedNFTCounter += _tokenHashs.length;
-        emit MultipleMintingHappend(msg.sender, _tokenHashs);   
+    function mintMultipleNFT(uint256 _count) external payable nonReentrant {
+        require(_count > 0, "Invalid count." );        
+        require(msg.value >= _mintingFee * _count, "Invalid price, price is less than minting fee * count");
+        require(_MintedNFTCounter + _count < collectionMaxNFTNumber, "Exceed Max NFT number.");
+        EvoBullNFT(evoNFTaddress).batchMint(msg.sender, _count);  
+        _MintedNFTCounter += _count;
+        emit MultipleMintingHappend(msg.sender, _count);   
     }
     
     function getWithdrawBalance(uint8 _kind) public  view returns (uint256) {

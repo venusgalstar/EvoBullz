@@ -136,12 +136,7 @@ function Home() {
         else{
           counts2mint = count;
         }
-        let mintingURIs = [], j;
-        for(j=0; j< counts2mint; j++) 
-        {
-          mintingURIs.push((Number(mintedNFTCount)+j).toString());
-        }
-        await mintMultipleNFT(account, mintingURIs, config.MINTING_FEE_PER_NFT * counts2mint);
+        await mintMultipleNFT(account, counts2mint, config.MINTING_FEE_PER_NFT * counts2mint);
       }
       else NotificationManager.warning("Please connect your wallet.", "Warning",  2000)
     }, 1000);

@@ -15,10 +15,28 @@
 				"internalType": "uint256",
 				"name": "_minFee",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_maxNFTNumber",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "ChangeCollectionNFTNumber",
+		"type": "event"
 	},
 	{
 		"anonymous": false,
@@ -121,9 +139,9 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "string[]",
-				"name": "tokenUris",
-				"type": "string[]"
+				"internalType": "uint256",
+				"name": "count",
+				"type": "uint256"
 			}
 		],
 		"name": "MultipleMintingHappend",
@@ -188,12 +206,6 @@
 				"internalType": "address",
 				"name": "addr",
 				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "tokenUri",
-				"type": "string"
 			}
 		],
 		"name": "SingleMintingHappend",
@@ -340,6 +352,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "getMaxNftNumber",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "getMintedNFTCount",
 		"outputs": [
 			{
@@ -463,9 +488,9 @@
 	{
 		"inputs": [
 			{
-				"internalType": "string[]",
-				"name": "_tokenHashs",
-				"type": "string[]"
+				"internalType": "uint256",
+				"name": "_count",
+				"type": "uint256"
 			}
 		],
 		"name": "mintMultipleNFT",
@@ -474,13 +499,7 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_tokenHash",
-				"type": "string"
-			}
-		],
+		"inputs": [],
 		"name": "mintSingleNFT",
 		"outputs": [],
 		"stateMutability": "payable",
@@ -590,6 +609,19 @@
 			}
 		],
 		"name": "setEvoTokenAddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
+		"name": "setMaxNftNumber",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
