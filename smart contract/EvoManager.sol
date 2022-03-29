@@ -19,7 +19,7 @@ contract EvoManager is Ownable {
     address evoNFTaddress;
     address evoTokenAddress;
 
-    uint _StakingIdCounter;
+    uint _MintedNFTCounter;
     bool _status;
     uint256 private _mintingFee;
     uint256 public RewardTokenPerBlock;
@@ -40,13 +40,14 @@ contract EvoManager is Ownable {
     event EvoCollectionUriChanged(address addr, string collectionUri);
     event Stake(address indexed user, uint256 amount);
     event UnStake(address indexed user, uint256 amount);
+    event ChangeMintingCounterValue(uint256 count);
     
     constructor(address _nftAddress, address _evoAddress, uint256 _minFee) {
         evoManagerAddress = msg.sender;
         evoNFTaddress = _nftAddress;
         evoTokenAddress = _evoAddress;
         _mintingFee = _minFee;
-        _StakingIdCounter = 0;
+        _MintedNFTCounter = 0;
         _status = false;
         RewardTokenPerBlock = 40 ether;
     }
@@ -104,12 +105,23 @@ contract EvoManager is Ownable {
     function getMintingFee()  view external returns(uint256) {
         return _mintingFee;
     }
+    
+    function setMintedNFTCount(uint256 _count) external onlyOwner {
+        require(_count >= 0, "Invalid count value");
+        _MintedNFTCounter = _count;
+        emit ChangeMintingCounterValue(_MintedNFTCounter);
+    }
+
+    function getMintedNFTCount()  view external returns(uint256) {
+        return _MintedNFTCounter;
+    }
 
     function mintSingleNFT(string memory _tokenHash) external payable nonReentrant {
         require(msg.value >= _mintingFee, "Invalid price, price is less than minting fee.");
         require(!_tokenHashExists[_tokenHash], "Existing NFT hash value....");
         EvoBullNFT(evoNFTaddress).mint(msg.sender, _tokenHash);
         _tokenHashExists[_tokenHash] = true;
+        _MintedNFTCounter++;
         emit SingleMintingHappend(msg.sender, _tokenHash);
     }
 
@@ -122,7 +134,8 @@ contract EvoManager is Ownable {
             require(!_tokenHashExists[_tokenHashs[i]], "Existing NFT hash value....");
             _tokenHashExists[_tokenHashs[i]] = true;
         }
-        EvoBullNFT(evoNFTaddress).batchMint(msg.sender, _tokenHashs);     
+        EvoBullNFT(evoNFTaddress).batchMint(msg.sender, _tokenHashs);  
+        _MintedNFTCounter += _tokenHashs.length;
         emit MultipleMintingHappend(msg.sender, _tokenHashs);   
     }
     

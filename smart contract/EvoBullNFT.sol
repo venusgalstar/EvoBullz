@@ -14,7 +14,7 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
     string base_uri;
 
     constructor() ERC721("EvoBullNFT", "EBNFT") {
-        base_uri = "https://ipfs.infura.io/ipfs/QmZAQMqPBHTifSe1jGoCex3We2DAwGVsLpHARr5Sis5EnV/";
+        base_uri = "https://ipfs.infura.io/ipfs/QmQP3NoMfSAqfxt6Je2Ra2X9qM2HDDcqM37Xta4UW7Xwtw/";
     }
 
     function getBaseuri() public view returns(string memory){

@@ -52,6 +52,19 @@
 			{
 				"indexed": false,
 				"internalType": "uint256",
+				"name": "count",
+				"type": "uint256"
+			}
+		],
+		"name": "ChangeMintingCounterValue",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
 				"name": "fee",
 				"type": "uint256"
 			}
@@ -327,6 +340,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "getMintedNFTCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "getMintingFee",
 		"outputs": [
 			{
@@ -564,6 +590,19 @@
 			}
 		],
 		"name": "setEvoTokenAddress",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_count",
+				"type": "uint256"
+			}
+		],
+		"name": "setMintedNFTCount",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

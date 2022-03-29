@@ -2,7 +2,7 @@ import Web3 from "web3";
 import store from '../store';
 import config from "../config";
 import create from "ipfs-http-client";
-import {setConnectedWalletAddress, setWalletStatus, setConnectedChainId, updateBalanceOfUser} from "../store/actions/auth.actions"; 
+import {setConnectedWalletAddress, setWalletStatus, setConnectedChainId, updateBalanceOfUser, updateMintedNFTCountAfterTrading} from "../store/actions/auth.actions"; 
 import { setNFTTradingResult, updateStakedNFTList, updateTotalReward, updateEvoNFTList } from "../store/actions/nft.actions";
 import isEmpty from "../utilities/isEmpty";
 import axios from "axios";
@@ -293,7 +293,7 @@ export const createNftFile = async (file, title, description) => {
     /*
      Multiple mint :  mintMultipleNFT(string[] memory tokenUris)
     */
-      
+
     try 
     {
       let EvoManagerContract = await new window.web3.eth.Contract(config.EvoManagerContractAbi, config.EvoManagerContractAddress);
@@ -546,4 +546,27 @@ export const createNftFile = async (file, title, description) => {
       }
     }
   }
+  
+  export const getMintedNFTCount = async () => 
+  {
+    /*
+      claim()
+    */
+      
+    try 
+    {
+      let EvoManagerContract = await new window.web3.eth.Contract(config.EvoManagerContractAbi, config.EvoManagerContractAddress);
+
+      var count = 0;
+       
+      count = await EvoManagerContract.methods.getMintedNFTCount().call();
+
+      store.dispatch(updateMintedNFTCountAfterTrading(count));
+  
+    } catch (error) {
+      store.dispatch(updateMintedNFTCountAfterTrading(0));
+  
+    }
+  }
+
 

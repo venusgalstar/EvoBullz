@@ -27,8 +27,7 @@ const Staking = () =>
     const nftOperationResult = useSelector( state => state.nft.tradingResult );
     const stakedItems = useSelector(state => state.nft.stakedList);
     const totalReward = useSelector(state => state.nft.totalReward);
-    
-    
+        
     useEffect(() =>{
         
         if(updateListTimer !== null) clearInterval(updateListTimer);

@@ -1,4 +1,4 @@
-import { AUTH_LOGOUT, AUTH_SUCCESS, GET_USER_DETAIL, SET_CHAIN_ID, UPDATE_USER_BALANCE, UPDATE_WALLET_STATUS,  SET_AVAX_PRICE, SET_OTHER_USER_DETAIL, SET_WALLET_ADDR, CURRENT_USER } from "./action.types"
+import { AUTH_LOGOUT, AUTH_SUCCESS, GET_USER_DETAIL, SET_CHAIN_ID, UPDATE_MINTED_NFT_COUNT, UPDATE_USER_BALANCE, UPDATE_WALLET_STATUS,  SET_AVAX_PRICE, SET_OTHER_USER_DETAIL, SET_WALLET_ADDR, CURRENT_USER } from "./action.types"
 import axios from "axios";
 import config from "../../config";
 
@@ -102,3 +102,13 @@ export const setAvaxPrice = (price) => dispatch => {
         payload: { avax: price }
     })
 }
+
+export const updateMintedNFTCountAfterTrading =  (count) => dispatch =>
+{
+    //UPDATE_MINTED_NFT_COUNT
+    dispatch({
+        type: UPDATE_MINTED_NFT_COUNT,
+        payload: count
+    })
+}
+
