@@ -7,9 +7,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { styled } from '@mui/material/styles';
 import { useNavigate} from "@reach/router";
 import { useSelector, useDispatch } from "react-redux";
-import { getUsersEvoNFTs, mintMultipleNFT } from '../interactWithSmartContract';
+import { getMintedNFTCount, getUsersEvoNFTs, mintMultipleNFT } from '../interactWithSmartContract';
 import isEmpty from '../utilities/isEmpty';
 import { emptyNFTTradingResult } from '../store/actions/nft.actions';
+import config from '../config';
 
 const mintTheme = createTheme({
   palette: {
@@ -70,10 +71,12 @@ const PrettoSlider = styled(Slider)({
 function Home() {
 
   const [count, setCount] = useState(5);
+  const [mintedCount, setMitedCount] = useState(0);
 
   const account = useSelector( state => state.auth.currentWallet );
   const nftOperationResult = useSelector( state => state.nft.tradingResult );
   const walletStatus = useSelector(state => state.auth.walletStatus);
+  const mintedNFTCount = useSelector(state => state.auth.mintedNFTCount);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -95,6 +98,7 @@ function Home() {
           }
           if(nftOperationResult.success === false) NotificationManager.error(nftOperationResult.message, "Error", 2000);
           dispatch(emptyNFTTradingResult());
+          getMintedNFTCount();
           setTimeout(() => 
           {           
             getUsersEvoNFTs(account);
@@ -103,10 +107,44 @@ function Home() {
       }
     }
   }, [nftOperationResult, account, dispatch])
+  
+  useEffect(() =>
+  {    
+    getMintedNFTCount();
+  }, [])
+  
+  useEffect(() =>
+  {
+    setMitedCount(mintedNFTCount)
+  }, [mintedNFTCount]);
 
-  const onClickMint = async () => {
-    if( !isEmpty(account) && walletStatus === true) await mintMultipleNFT(account, ["2", "3", "4"], 0.15);
-    else NotificationManager.warning("Please connect your wallet.", "Warning",  2000)
+  const onClickMint = () => {    
+    getMintedNFTCount();
+    setTimeout(async () => {
+      if( !isEmpty(account) && walletStatus === true) 
+      {
+        let counts2mint = 0;
+        if(mintMultipleNFT >= config.NFT_MAX_MINT)
+        {
+          NotificationManager.warning("You've failed. All ever bullz were minted.", "Information",  2000)
+          return;
+        }
+        if(count + Number(mintedNFTCount) > config.NFT_MAX_MINT)
+        {
+          counts2mint = count + Number(mintedNFTCount) - config.NFT_MAX_MINT;
+        }
+        else{
+          counts2mint = count;
+        }
+        let mintingURIs = [], j;
+        for(j=0; j< counts2mint; j++) 
+        {
+          mintingURIs.push((Number(mintedNFTCount)+j).toString());
+        }
+        await mintMultipleNFT(account, mintingURIs, config.MINTING_FEE_PER_NFT * counts2mint);
+      }
+      else NotificationManager.warning("Please connect your wallet.", "Warning",  2000)
+    }, 1000);
   }
 
   return (
@@ -144,13 +182,13 @@ function Home() {
             </div>
             <div className="control_mint_panel" style={{ justifyContent: "flex-start" }}>
               <div className='c-w fs-60 h-60 flex align-center justify-center noto-bold font-bold'>
-                0°  /  333
+                {mintedCount}°  /  {config.NFT_MAX_MINT}
               </div>
               <div className='c-w h-50 fs-20 flex align-center noto-bold font-bold'>
                 minted
               </div>
               <div className='c-w h-70 fs-32 flex align-center noto-bold font-bold'>
-                Price: {count * 50} CRO
+                Price: {Number(count * config.MINTING_FEE_PER_NFT).toFixed(2)} CRO
               </div>
               <div className='flex flex-col align-center justify-center h-100' >
                 <PrettoSlider

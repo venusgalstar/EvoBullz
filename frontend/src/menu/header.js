@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import isEmpty from "../utilities/isEmpty";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Button } from "@mui/material";
-import { connectWallet, getUsersEvoNFTs } from '../interactWithSmartContract';
+import { connectWallet, getMintedNFTCount, getUsersEvoNFTs } from '../interactWithSmartContract';
 import { setConnectedWalletAddress } from '../store/actions/auth.actions';
 
 const connectTheme = createTheme({
@@ -39,6 +39,7 @@ const Header= function() {
     compAddress = account.substring(0, 6)+"..."+account.substring(account.length-4, account.length);
     setCompressedAddress(compAddress);  
     getUsersEvoNFTs(account);
+    getMintedNFTCount();
     
   }, [account, dispatch])
 
