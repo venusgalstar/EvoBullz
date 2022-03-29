@@ -10,11 +10,10 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    mapping(string => uint256) _getNFTId;
     string base_uri;
 
     constructor() ERC721("EvoBullNFT", "EBNFT") {
-        base_uri = "https://ipfs.infura.io/ipfs/QmQP3NoMfSAqfxt6Je2Ra2X9qM2HDDcqM37Xta4UW7Xwtw/";
+        base_uri = "https://ipfs.infura.io/ipfs/QmU7S7urCReuuzfhcrFT9uko2ntUTQziQMbLZUbQULYjqq/";
     }
 
     function getBaseuri() public view returns(string memory){
@@ -26,8 +25,8 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
         return base_uri;
     }
 
-    function tranferNFT(address _from, address _to, string memory _tokenUri) external payable {
-        transferFrom(_from, _to, _getNFTId[_tokenUri]);
+    function tranferNFT(address _from, address _to, uint256 _tokenId) external payable {
+        transferFrom(_from, _to, _tokenId);
     }
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
@@ -37,35 +36,45 @@ contract EvoBullNFT is ERC721URIStorage, Ownable {
     function setTokenURI(uint256 tokenId, string memory _tokenURI) internal {
         super._setTokenURI(tokenId, _tokenURI);
     }
+    
+    function itod(uint256 x) private pure returns (string memory) {
+        if (x > 0) {
+            string memory str;
+            while (x > 0) {
+                str = string(abi.encodePacked(uint8(x % 10 + 48), str));
+                x /= 10;
+            }
+            return str;
+        }
+        return "0";
+    }
 
-    function mint(address recipient, string memory _tokenURI)  external  returns (uint256) {
-         // require(msg.value == 0.5 ether);
-         
+    function mint(address recipient)  external  returns (uint256) {     
+        require(recipient != address(0), "Invalid recipient address." );           
+                 
         _tokenIds.increment();
 
         uint256 nftId = _tokenIds.current(); 
         _mint(recipient, nftId);
-        _getNFTId[_tokenURI] = nftId;
-        string memory fullUri = string.concat(base_uri, _tokenURI);
+        string memory fullUri = string.concat(base_uri, itod(nftId));
         setTokenURI(nftId, fullUri);
 
         return nftId;
     }
-    
-    function batchMint(address recipient, string[] memory _tokenURIArry)  external  returns (uint256[] memory) {        
-        require(_tokenURIArry.length > 0, "Invalid arguments, no uris." );
-        uint256 len = _tokenURIArry.length;
+
+    function batchMint(address recipient, uint256 _count)  external  returns (uint256[] memory) {        
+        require(recipient != address(0), "Invalid recipient address." );           
+        require(_count > 0, "Invalid count value." );       
         uint256 i; 
-        uint256[] memory nftIds = new uint256[](len);
+        uint256[] memory nftIds = new uint256[](_count);
         string memory fullUri;
-        for(i = 0; i < len; i++)
+        for(i = 0; i < _count; i++)
         {
             _tokenIds.increment();
 
             uint256 nftId = _tokenIds.current(); 
             _mint(recipient, nftId);
-            _getNFTId[_tokenURIArry[i]] = nftId;
-            fullUri = string.concat(base_uri, _tokenURIArry[i]);
+            fullUri = string.concat(base_uri, itod(nftId));
             setTokenURI(nftId, fullUri);
             nftIds[i] = nftId;
         }

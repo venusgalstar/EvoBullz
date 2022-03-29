@@ -143,9 +143,9 @@
 				"type": "address"
 			},
 			{
-				"internalType": "string[]",
-				"name": "_tokenURIArry",
-				"type": "string[]"
+				"internalType": "uint256",
+				"name": "_count",
+				"type": "uint256"
 			}
 		],
 		"name": "batchMint",
@@ -221,11 +221,6 @@
 				"internalType": "address",
 				"name": "recipient",
 				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "_tokenURI",
-				"type": "string"
 			}
 		],
 		"name": "mint",
@@ -443,9 +438,9 @@
 				"type": "address"
 			},
 			{
-				"internalType": "string",
-				"name": "_tokenUri",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
 			}
 		],
 		"name": "tranferNFT",

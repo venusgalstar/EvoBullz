@@ -288,7 +288,7 @@ export const createNftFile = async (file, title, description) => {
     }
   };
 
-  export const mintMultipleNFT = async (currentAddr, tokenUris, fee) => 
+  export const mintMultipleNFT = async (currentAddr, count, fee) => 
   {
     /*
      Multiple mint :  mintMultipleNFT(string[] memory tokenUris)
@@ -299,7 +299,7 @@ export const createNftFile = async (file, title, description) => {
       let EvoManagerContract = await new window.web3.eth.Contract(config.EvoManagerContractAbi, config.EvoManagerContractAddress);
       let minting_fee = window.web3.utils.toWei(fee !== null ? fee.toString() : '0', 'ether');
       
-      var mintMultipleNFT = EvoManagerContract.methods.mintMultipleNFT(tokenUris);
+      var mintMultipleNFT = EvoManagerContract.methods.mintMultipleNFT(count);
       let gasFee = await mintMultipleNFT.estimateGas({ from: currentAddr, value: minting_fee });
       var balanceOfUser = await window.web3.eth.getBalance(currentAddr);
       var gasPrice = 30 * (10 ** 9);
