@@ -188,7 +188,7 @@ function Home() {
                 minted
               </div>
               <div className='c-w h-70 fs-32 flex align-center noto-bold font-bold'>
-                Price: {Number(count * config.MINTING_FEE_PER_NFT).toFixed(2)} BNB
+                Price: {Number(count * config.MINTING_FEE_PER_NFT).toFixed(2)} CRO
               </div>
               <div className='flex flex-col align-center justify-center h-100' >
                 <PrettoSlider
